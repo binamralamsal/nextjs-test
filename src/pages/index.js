@@ -1,13 +1,57 @@
 import Link from "next/link";
 import { getTweetsAPI } from "@/pages/api/tweets";
+import { useState } from "react";
 
 export default function Home(props) {
+  const [tweet, setTweet] = useState("");
+  const [author, setAuthor] = useState("");
+
+  const [tweets, setTweets] = useState(props.tweets);
+
+  async function handleNewTweet(e) {
+    e.preventDefault();
+
+    const res = await fetch("/api/tweets/new", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        tweet,
+        author,
+      }),
+    });
+
+    const newTweet = await res.json();
+
+    setTweet("");
+    setAuthor("");
+
+    setTweets([newTweet, ...props.tweets]);
+  }
+
   return (
     <div>
       <h1>Home Page</h1>
 
+      <form onSubmit={handleNewTweet}>
+        <input
+          type="text"
+          placeholder="Tweet"
+          value={tweet}
+          onChange={(e) => setTweet(e.target.value)}
+        />
+        <input
+          type="text"
+          placeholder="Author"
+          value={author}
+          onChange={(e) => setAuthor(e.target.value)}
+        />
+        <button type="submit">Submit</button>
+      </form>
+
       <ul>
-        {props.tweets.map((t) => (
+        {tweets.map((t) => (
           <li key={t.id}>
             <small>
               {t.author} - {new Date(t.createdAt).toLocaleDateString()}
