@@ -15,11 +15,15 @@ import fs from "fs/promises";
 export default async function handler(req, res) {
   // We only want to send data in GET requests.
   if (req.method === "GET") {
-    const filePath = path.join(process.cwd(), "src/data/tweets.json");
-
-    const data = await fs.readFile(filePath);
-    const tweets = JSON.parse(data.toString());
+    const tweets = await getTweetsAPI();
 
     res.status(200).json(tweets);
   }
+}
+
+export async function getTweetsAPI() {
+  const filePath = path.join(process.cwd(), "src/data/tweets.json");
+
+  const data = await fs.readFile(filePath);
+  return JSON.parse(data.toString());
 }
