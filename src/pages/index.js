@@ -8,7 +8,7 @@ export default function Home(props) {
    * You will realize that this will also be logged in console of the Next.js development
    * server, that's because Next.js runs any code inside your page for generating HTML.
    */
-  console.log(props);
+  // console.log(props);
 
   return (
     <div>
@@ -51,10 +51,32 @@ export default function Home(props) {
  * access request object, query parameters, HTTP headers, etc. Code or packages that is being
  * used in only getServerSideProps will never be sent to client.
  */
-export async function getServerSideProps() {
+export async function getServerSideProps(context) {
+  /*
+   * context parameter consists of different values like req, res, query, params, etc.
+   * Which means, you can set or get cookies, redirect, etc. from here. You can also manually create 404
+   * error.
+   * https://nextjs.org/docs/api-reference/data-fetching/get-server-side-props#context-parameter
+   */
   const res = await fetch("https://jsonplaceholder.typicode.com/posts");
 
   const posts = await res.json();
+
+  // When you visit /?notFoundTest=true then you will see 404 page.
+  if (context.query.notFoundTest) {
+    return {
+      notFound: true,
+    };
+  }
+
+  // When you visit /?redirecTest=true then you will redirect to /tweets
+  if (context.query.redirectTest) {
+    return {
+      redirect: {
+        destination: "/tweets",
+      },
+    };
+  }
 
   // Return an object containing props having value that you want in your page component.
   return {
