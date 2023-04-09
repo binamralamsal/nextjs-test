@@ -39,7 +39,7 @@ export default function Home(props) {
     const data = await res.json();
     console.log(data);
 
-    setTweets((prev) => prev.filter((t) => t.id !== id));
+    setTweets((prev) => prev.filter((t) => t._id !== id));
   }
 
   return (
@@ -64,15 +64,15 @@ export default function Home(props) {
 
       <ul>
         {tweets.map((t) => (
-          <li key={t.id}>
+          <li key={t._id}>
             <small>
               {t.author} - {new Date(t.createdAt).toLocaleDateString()}
             </small>
             <h2>
-              <Link href={`/tweets/${t.id}`}>{t.tweet}</Link>
+              <Link href={`/tweets/${t._id}`}>{t.tweet}</Link>
             </h2>
 
-            <button onClick={() => handleDeleteTweet(t.id)}>Delete</button>
+            <button onClick={() => handleDeleteTweet(t._id)}>Delete</button>
           </li>
         ))}
       </ul>
@@ -80,7 +80,7 @@ export default function Home(props) {
   );
 }
 
-export async function getServerSideProps(context) {
+export async function getServerSideProps() {
   /*
    * Here, I am accessing the API that I created and sending that back to the page.
    *
@@ -95,7 +95,16 @@ export async function getServerSideProps(context) {
   //
   // const tweets = await res.json();
 
-  const tweets = await getTweetsAPI();
+  // https://github.com/vercel/next.js/blob/canary/examples/with-mongodb-mongoose/pages/index.js#L56
+  const result = await getTweetsAPI();
+  const tweets = result.map((doc) => {
+    const tweet = doc.toObject();
+    tweet._id = tweet._id.toString();
+    tweet.createdAt = tweet.createdAt.toString();
+    tweet.updatedAt = tweet.updatedAt.toString();
+
+    return tweet;
+  });
 
   return {
     props: {

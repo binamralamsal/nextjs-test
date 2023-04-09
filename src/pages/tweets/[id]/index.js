@@ -6,7 +6,7 @@ export default function SingleTweetPage(props) {
       <h1>{props.tweet.tweet}</h1>
       <p>
         {props.tweet.author} -{" "}
-        {new Date(props.tweet.createdAt).toLocaleString()}
+        {new Date(props.tweet.createdAt).toLocaleDateString()}
       </p>
     </div>
   );
@@ -23,7 +23,10 @@ export async function getServerSideProps(context) {
    * Which means context.params only contains dynamic route params and context.query contains
    * both dynamic route params and route queries.
    */
-  const tweet = await getTweetsFromIdAPI(context.params.id);
+  const tweet = (await getTweetsFromIdAPI(context.params.id)).toObject();
+  tweet._id = tweet._id.toString();
+  tweet.createdAt = tweet.createdAt.toString();
+  tweet.updatedAt = tweet.updatedAt.toString();
 
   return { props: { tweet } };
 }
