@@ -7,7 +7,8 @@ export default async function handler(req, res) {
     const tweets = await getTweetsAPI();
 
     const newTweet = {
-      id: (tweets.length + 1).toString(),
+      // Fixed bug for deletion
+      id: new Date(),
       tweet: req.body.tweet,
       author: req.body.author,
       createdAt: new Date(),
