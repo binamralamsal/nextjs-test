@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Home(props) {
   /*
    * You will see values here coming from getStaticProps. If you remove pageProps
@@ -15,7 +17,9 @@ export default function Home(props) {
       <ul>
         {props.posts.map((p) => (
           <li key={p.id}>
-            <h2>{p.title}</h2>
+            <h2>
+              <Link href={`/tweets/${p.id}`}>{p.title}</Link>
+            </h2>
             <p>{p.body}</p>
           </li>
         ))}

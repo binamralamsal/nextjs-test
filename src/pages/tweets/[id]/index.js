@@ -1,29 +1,71 @@
-// This page will be mapped to /tweets/1, /tweets/2, etc.
+export default function SingleTweetPage(props) {
+  console.log(props.post);
 
-import { useRouter } from "next/router";
+  return (
+    <div>
+      <h1>{props.post.title}</h1>
+      <p>{props.post.body}</p>
+    </div>
+  );
+}
 
-export default function SingleTweetPage() {
-  // This is one of the special hooks provided by Next.js
-  const router = useRouter();
+/*
+ * We discussed how we can use getStaticProps in static paths but what about
+ * dynamic paths? How can we get access to the id from the URL? We already discussed
+ * that we can't gain access to request object, it's params and not even URL since
+ * getStaticProps only runs during build time? Well, there is a solution for that. If
+ * we can't gain access to id from dynamic path then we can still generate static pages
+ * of all the ids that we have.
+ *
+ * getStaticPaths is used to define all the paths that we want to generate static pages for.
+ * It will generate for every path, so be careful about not to provide too many paths because
+ * that's going to slow down the build process.
+ */
+
+/*
+ * What's the flow of it?
+ * - First getStaticPaths runs during build time, then Next.js will use the paths returned by getStaticPaths
+ *   and will pass the params to getStaticProps to build for every of those paths. Both of these functions
+ *   will run during build time.
+ */
+export async function getStaticPaths() {
+  /*
+   * Paths should be array containing objects having params with an object.
+   * id key inside params object is required here because our dynamic path is /tweets/[id].
+   * The value of id or any other key must be string here. If you have different name for dynamic path,
+   * then you will have to use that. For example, if our path is /tweets/[tweetId] then you will have
+   * to include { params: { tweetId: "1" } }. If you have multiple dynamic paths then you have to include
+   * all of those. If you pass any other values to params then getStaticPaths will just ignore it.
+   */
+  const paths = [
+    { params: { id: "1", junk: "Hello" } },
+    { params: { id: "2", junk: "Hello" } },
+    { params: { id: "3", junk: "Hello" } },
+    { params: { id: "4", junk: "Hello" } },
+    { params: { id: "5", junk: "Hello" } },
+  ];
+  /*
+   * For now, we are specifying all paths manually, that might be fine for few paths but not for paths
+   * stored in database, we will discuss about tackling this issue later.
+   */
 
   /*
-   * route.query consists all the data from dynamic URL and also query params.
-   * If you go to /tweets/1 then you will get { id: "1" }
-   * If you go to /tweets/1?filter=true then you will get { id: "1", filter: "true" }
+   * getStaticPaths must return paths and fallback value. We will discuss fallback later.
    */
-  console.log(router.query);
-  // router.pathname is just going to be /tweets/[id]
-  console.log(router.pathname);
-  /*
-   * When a page is loaded in Next.js, router may not be immediately ready,
-   * so you can use router.isReady to know when you can access values of router.query
-   * You might have already noticed that router.query is empty initially
-   * then it changes to actual value in console. It's because Next.js
-   * has to perform hydration to actually make the website dynamic
-   * and that's why router takes a bit to load, the time taken is negligible to user
-   * but you will still see it in console.
-   */
-  console.log(router.isReady);
+  return { paths, fallback: false };
+}
 
-  return <div>Single Tweet Page {router.query.id}</div>;
+export async function getStaticProps(context) {
+  /*
+   * If you visit /tweets/1 then you will see { id: '1' } as context.params.
+   * You will realize that, junk passed from getStaticPaths is ignored by Next.js because
+   * that's not really required.
+   */
+  console.log(context.params);
+  const res = await fetch(
+    `https://jsonplaceholder.typicode.com/posts/${context.params.id}`
+  ); // This code is fetching posts from jsonplaceholder with id that we got.
+
+  const post = await res.json();
+  return { props: { post } };
 }
