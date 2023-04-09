@@ -27,7 +27,19 @@ export default function Home(props) {
     setTweet("");
     setAuthor("");
 
-    setTweets([newTweet, ...props.tweets]);
+    // Fix bug where it wasn't updating properly
+    setTweets((prev) => [newTweet, ...prev]);
+  }
+
+  async function handleDeleteTweet(id) {
+    const res = await fetch(`/api/tweets/${id}`, {
+      method: "DELETE",
+    });
+
+    const data = await res.json();
+    console.log(data);
+
+    setTweets((prev) => prev.filter((t) => t.id !== id));
   }
 
   return (
@@ -59,6 +71,8 @@ export default function Home(props) {
             <h2>
               <Link href={`/tweets/${t.id}`}>{t.tweet}</Link>
             </h2>
+
+            <button onClick={() => handleDeleteTweet(t.id)}>Delete</button>
           </li>
         ))}
       </ul>
