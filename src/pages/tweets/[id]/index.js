@@ -1,8 +1,15 @@
 import { getTweetsFromIdAPI } from "@/pages/api/tweets/[id]";
+import Head from "next/head";
 
 export default function SingleTweetPage(props) {
+  const title = `Thapa Technical Twitter - Tweet from ${props.tweet.author}`;
+
   return (
     <div>
+      <Head>
+        {/*  Always create variable like this to use, otherwise you will get an error. */}
+        <title>{title}</title>
+      </Head>
       <h1>{props.tweet.tweet}</h1>
       <p>
         {props.tweet.author} -{" "}

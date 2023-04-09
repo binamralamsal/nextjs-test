@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTweetsAPI } from "@/pages/api/tweets";
 import { useState } from "react";
+import Head from "next/head";
 
 export default function Home(props) {
   const [tweet, setTweet] = useState("");
@@ -44,6 +45,11 @@ export default function Home(props) {
 
   return (
     <div>
+      {/* This title will replace the one of _app.js */}
+      <Head>
+        <title>Thapa Technical Twitter - Home</title>
+      </Head>
+
       <h1>Home Page</h1>
 
       <form onSubmit={handleNewTweet}>
