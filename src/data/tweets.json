@@ -1,8 +1,1 @@
-[
-  {
-    "id": "1",
-    "author": "Binamra Lamsal",
-    "tweet": "How are you all?",
-    "createdAt": 1681054687668
-  }
-]
+[{"id":"1","author":"Binamra Lamsal","tweet":"How are you all?","createdAt":1681054687668},{"id":"2","tweet":"Hello","author":"Binamra Lamsal","createdAt":"2023-04-09T16:03:34.987Z"}]

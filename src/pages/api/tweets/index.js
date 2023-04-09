@@ -25,5 +25,8 @@ export async function getTweetsAPI() {
   const filePath = path.join(process.cwd(), "src/data/tweets.json");
 
   const data = await fs.readFile(filePath);
-  return JSON.parse(data.toString());
+  const tweets = JSON.parse(data.toString());
+
+  // Sort by date
+  return tweets.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
