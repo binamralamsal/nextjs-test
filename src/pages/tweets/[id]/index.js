@@ -1,8 +1,13 @@
+import { getTweetsFromIdAPI } from "@/pages/api/tweets/[id]";
+
 export default function SingleTweetPage(props) {
   return (
     <div>
-      <h1>{props.post.title}</h1>
-      <p>{props.post.body}</p>
+      <h1>{props.tweet.tweet}</h1>
+      <p>
+        {props.tweet.author} -{" "}
+        {new Date(props.tweet.createdAt).toLocaleString()}
+      </p>
     </div>
   );
 }
@@ -18,11 +23,7 @@ export async function getServerSideProps(context) {
    * Which means context.params only contains dynamic route params and context.query contains
    * both dynamic route params and route queries.
    */
-  console.log(context.params, context.query);
-  const res = await fetch(
-    `https://jsonplaceholder.typicode.com/posts/${context.params.id}`
-  ); // This code is fetching posts from jsonplaceholder with id that we got.
+  const tweet = await getTweetsFromIdAPI(context.params.id);
 
-  const post = await res.json();
-  return { props: { post } };
+  return { props: { tweet } };
 }
