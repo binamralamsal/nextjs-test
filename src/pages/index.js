@@ -1,88 +1,71 @@
-export default function Home() {
+export default function Home(props) {
+  /*
+   * You will see values here coming from getStaticProps. If you remove pageProps
+   * from _app.js then you will see that props will be empty.
+   *
+   * You will realize that this will also be logged in console of the Next.js development
+   * server, that's because Next.js runs any code insider your page for generating HTML.
+   */
+  console.log(props);
+
   return (
     <div>
       <h1>Home Page</h1>
 
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum eius
-        error eveniet expedita fuga neque sint ut vitae! Amet aspernatur
-        assumenda culpa eum, fuga hic iste laudantium placeat provident quaerat
-        ut voluptatibus voluptatum. Alias aperiam deserunt fugit laudantium,
-        saepe sit tenetur voluptate. Aliquam consequuntur debitis eveniet hic
-        incidunt ipsum necessitatibus officiis, quidem tenetur! A accusamus
-        consectetur dolor enim inventore modi, natus nulla quo ratione
-        repudiandae. Alias beatae dolorem nam nihil omnis, placeat repellat sed?
-        Aliquid eum excepturi facere minus placeat rem rerum sapiente? Ad atque
-        commodi corporis dignissimos dolores doloribus eos, laborum maxime nisi
-        nulla, possimus provident, quae quibusdam ratione suscipit vel velit.
-        Cumque, porro, similique? Alias, commodi consequatur corporis eaque fuga
-        iste sint. A, adipisci aspernatur aut blanditiis cumque dignissimos
-        doloremque eligendi error illum iste iusto minus neque nisi, numquam
-        obcaecati, possimus quia quis recusandae sapiente veritatis. Accusamus
-        aspernatur atque earum harum illum impedit iste officiis! Ducimus
-        explicabo impedit ipsam laborum mollitia nihil quasi qui soluta tempora
-        temporibus! Ab, aspernatur debitis deleniti eius eligendi et eum, fugiat
-        harum hic illo ipsum minima nostrum praesentium quas quasi repudiandae
-        sit suscipit ut, vel voluptate. Corporis deserunt dicta dolorem laborum
-        molestiae omnis qui ratione rem unde vitae. Excepturi expedita
-        perferendis qui quo?
-      </p>
-
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum eius
-        error eveniet expedita fuga neque sint ut vitae! Amet aspernatur
-        assumenda culpa eum, fuga hic iste laudantium placeat provident quaerat
-        ut voluptatibus voluptatum. Alias aperiam deserunt fugit laudantium,
-        saepe sit tenetur voluptate. Aliquam consequuntur debitis eveniet hic
-        incidunt ipsum necessitatibus officiis, quidem tenetur! A accusamus
-        consectetur dolor enim inventore modi, natus nulla quo ratione
-        repudiandae. Alias beatae dolorem nam nihil omnis, placeat repellat sed?
-        Aliquid eum excepturi facere minus placeat rem rerum sapiente? Ad atque
-        commodi corporis dignissimos dolores doloribus eos, laborum maxime nisi
-        nulla, possimus provident, quae quibusdam ratione suscipit vel velit.
-        Cumque, porro, similique? Alias, commodi consequatur corporis eaque fuga
-        iste sint. A, adipisci aspernatur aut blanditiis cumque dignissimos
-        doloremque eligendi error illum iste iusto minus neque nisi, numquam
-        obcaecati, possimus quia quis recusandae sapiente veritatis. Accusamus
-        aspernatur atque earum harum illum impedit iste officiis! Ducimus
-        explicabo impedit ipsam laborum mollitia nihil quasi qui soluta tempora
-        temporibus! Ab, aspernatur debitis deleniti eius eligendi et eum, fugiat
-        harum hic illo ipsum minima nostrum praesentium quas quasi repudiandae
-        sit suscipit ut, vel voluptate. Corporis deserunt dicta dolorem laborum
-        molestiae omnis qui ratione rem unde vitae. Excepturi expedita
-        perferendis qui quo?
-      </p>
-
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorum eius
-        error eveniet expedita fuga neque sint ut vitae! Amet aspernatur
-        assumenda culpa eum, fuga hic iste laudantium placeat provident quaerat
-        ut voluptatibus voluptatum. Alias aperiam deserunt fugit laudantium,
-        saepe sit tenetur voluptate. Aliquam consequuntur debitis eveniet hic
-        incidunt ipsum necessitatibus officiis, quidem tenetur! A accusamus
-        consectetur dolor enim inventore modi, natus nulla quo ratione
-        repudiandae. Alias beatae dolorem nam nihil omnis, placeat repellat sed?
-        Aliquid eum excepturi facere minus placeat rem rerum sapiente? Ad atque
-        commodi corporis dignissimos dolores doloribus eos, laborum maxime nisi
-        nulla, possimus provident, quae quibusdam ratione suscipit vel velit.
-        Cumque, porro, similique? Alias, commodi consequatur corporis eaque fuga
-        iste sint. A, adipisci aspernatur aut blanditiis cumque dignissimos
-        doloremque eligendi error illum iste iusto minus neque nisi, numquam
-        obcaecati, possimus quia quis recusandae sapiente veritatis. Accusamus
-        aspernatur atque earum harum illum impedit iste officiis! Ducimus
-        explicabo impedit ipsam laborum mollitia nihil quasi qui soluta tempora
-        temporibus! Ab, aspernatur debitis deleniti eius eligendi et eum, fugiat
-        harum hic illo ipsum minima nostrum praesentium quas quasi repudiandae
-        sit suscipit ut, vel voluptate. Corporis deserunt dicta dolorem laborum
-        molestiae omnis qui ratione rem unde vitae. Excepturi expedita
-        perferendis qui quo?
-      </p>
-
       <ul>
-        <li>JavaScript</li>
-        <li>Python</li>
-        <li>C#</li>
+        {props.posts.map((p) => (
+          <li key={p.id}>
+            <h2>{p.title}</h2>
+            <p>{p.body}</p>
+          </li>
+        ))}
       </ul>
     </div>
   );
+}
+
+/*
+ * getStaticProps runs on build time (i.e. when you run `npm run build` command.)
+ * Your website is built automatically when you are in development mode. As it only
+ * runs during build time, you won't get new data when you refresh the page. You will have to
+ * run `npm run build` command again to get new data.
+ *
+ * How does this work?
+ * - First it runs on build time and fetches data from API.
+ * - Then it passes the data to _app.js.
+ * - Do you remember that we discussed that pageProps of _app.js is the data received
+ *   received through getStaticProps, getServerSideProps and so on? If you go to _app.js
+ *   then you will see it, which means if you remove the pageProps passed to the <Component />
+ *   then you will get empty data inside the Home component.
+ * - _app.js passes the pageProps to <Component />
+ *
+ * To build the website, run `npm run build` command. (Don't forget to stop the development server
+ * before running this command). After building, "/" is assigned as "●" which means we are using
+ * SSG or Static Site Generation on this page. You can see .next folder to see generated website.
+ *
+ * In development, Next.js will continuously build the website, so you might get illusion of
+ * dynamic data but that's not the case with production build. Production build won't change
+ * unless you build the project again.
+ *
+ * Don't forget to read: https://nextjs.org/docs/basic-features/data-fetching/get-static-props#when-should-i-use-getstaticprops
+ * before deciding if this is what you should use.
+ *
+ * getStaticProps can include any server code which means you can use any server side
+ * libraries, node.js builtin modules, external packages, connect to database, and so on.
+ *
+ * Since, getStaticProps only runs during build time and not in each request, you can't
+ * access request object, query parameters, HTTP headers, etc. Code or packages that is being
+ * used in only getStaticProps will never be sent to client.
+ */
+export async function getStaticProps() {
+  const res = await fetch("https://jsonplaceholder.typicode.com/posts");
+
+  const posts = await res.json();
+
+  // Return an object containing props having value that you want in your page component.
+  return {
+    props: {
+      posts,
+    },
+  };
 }
