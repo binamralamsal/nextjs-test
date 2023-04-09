@@ -2,11 +2,11 @@ import Link from "next/link";
 
 export default function Home(props) {
   /*
-   * You will see values here coming from getStaticProps. If you remove pageProps
+   * You will see values here coming from getServerSideProps. If you remove pageProps
    * from _app.js then you will see that props will be empty.
    *
    * You will realize that this will also be logged in console of the Next.js development
-   * server, that's because Next.js runs any code insider your page for generating HTML.
+   * server, that's because Next.js runs any code inside your page for generating HTML.
    */
   console.log(props);
 
@@ -29,13 +29,11 @@ export default function Home(props) {
 }
 
 /*
- * getStaticProps runs on build time (i.e. when you run `npm run build` command.)
- * Your website is built automatically when you are in development mode. As it only
- * runs during build time, you won't get new data when you refresh the page. You will have to
- * run `npm run build` command again to get new data.
+ * getServerSideProps runs on every requests sent by the users which means you will always
+ * get updated value since it runs for every requests sent by the users.
  *
  * How does this work?
- * - First it runs on build time and fetches data from API.
+ * - When user requests to visit this page, Next.js runs getServerSideProps.
  * - Then it passes the data to _app.js.
  * - Do you remember that we discussed that pageProps of _app.js is the data received
  *   received through getStaticProps, getServerSideProps and so on? If you go to _app.js
@@ -43,25 +41,17 @@ export default function Home(props) {
  *   then you will get empty data inside the Home component.
  * - _app.js passes the pageProps to <Component />
  *
- * To build the website, run `npm run build` command. (Don't forget to stop the development server
- * before running this command). After building, "/" is assigned as "●" which means we are using
- * SSG or Static Site Generation on this page. You can see .next folder to see generated website.
- *
- * In development, Next.js will continuously build the website, so you might get illusion of
- * dynamic data but that's not the case with production build. Production build won't change
- * unless you build the project again.
- *
- * Don't forget to read: https://nextjs.org/docs/basic-features/data-fetching/get-static-props#when-should-i-use-getstaticprops
+ * Don't forget to read: hhttps://nextjs.org/docs/basic-features/data-fetching/get-server-side-props#when-should-i-use-getserversideprops
  * before deciding if this is what you should use.
  *
- * getStaticProps can include any server code which means you can use any server side
+ * getServerSideProps can include any server code which means you can use any server side
  * libraries, node.js builtin modules, external packages, connect to database, and so on.
  *
- * Since, getStaticProps only runs during build time and not in each request, you can't
+ * Since, getServerSideProps runs during each request, you can
  * access request object, query parameters, HTTP headers, etc. Code or packages that is being
- * used in only getStaticProps will never be sent to client.
+ * used in only getServerSideProps will never be sent to client.
  */
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const res = await fetch("https://jsonplaceholder.typicode.com/posts");
 
   const posts = await res.json();
