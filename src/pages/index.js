@@ -2,10 +2,15 @@ import Link from "next/link";
 import { getTweetsAPI } from "@/pages/api/tweets";
 import { useState } from "react";
 import Head from "next/head";
+import { useSession } from "next-auth/react";
 
 export default function Home(props) {
   const [tweet, setTweet] = useState("");
   const [author, setAuthor] = useState("");
+  // useSession hook can be used to know if user is logged in or not
+  const session = useSession();
+
+  console.log(session);
 
   const [tweets, setTweets] = useState(props.tweets);
 
