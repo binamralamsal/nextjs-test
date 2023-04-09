@@ -1,4 +1,18 @@
+import { useRouter } from "next/router";
+
 export default function SingleTweetPage(props) {
+  const router = useRouter();
+
+  /*
+   * When fallback passed from getStaticPaths is set to true, Next.js will serve a "fallback" version.
+   * When router.isFallback is true, props.post will be undefined. So, we need to check if fallback
+   * version is being served or not. If it is, we will show loading indicator. Otherwise, we will show
+   * the page.
+   *
+   * It's not needed when you are using fallback: "blocking"
+   */
+  if (router.isFallback) return <div>Loading</div>;
+
   console.log(props.post);
 
   return (
@@ -9,58 +23,47 @@ export default function SingleTweetPage(props) {
   );
 }
 
-/*
- * We discussed how we can use getStaticProps in static paths but what about
- * dynamic paths? How can we get access to the id from the URL? We already discussed
- * that we can't gain access to request object, it's params and not even URL since
- * getStaticProps only runs during build time? Well, there is a solution for that. If
- * we can't gain access to id from dynamic path then we can still generate static pages
- * of all the ids that we have.
- *
- * getStaticPaths is used to define all the paths that we want to generate static pages for.
- * It will generate for every path, so be careful about not to provide too many paths because
- * that's going to slow down the build process.
- */
-
-/*
- * What's the flow of it?
- * - First getStaticPaths runs during build time, then Next.js will use the paths returned by getStaticPaths
- *   and will pass the params to getStaticProps to build for every of those paths. Both of these functions
- *   will run during build time.
- */
 export async function getStaticPaths() {
-  /*
-   * Paths should be array containing objects having params with an object.
-   * id key inside params object is required here because our dynamic path is /tweets/[id].
-   * The value of id or any other key must be string here. If you have different name for dynamic path,
-   * then you will have to use that. For example, if our path is /tweets/[tweetId] then you will have
-   * to include { params: { tweetId: "1" } }. If you have multiple dynamic paths then you have to include
-   * all of those. If you pass any other values to params then getStaticPaths will just ignore it.
-   */
   const paths = [
-    { params: { id: "1", junk: "Hello" } },
-    { params: { id: "2", junk: "Hello" } },
-    { params: { id: "3", junk: "Hello" } },
-    { params: { id: "4", junk: "Hello" } },
-    { params: { id: "5", junk: "Hello" } },
+    { params: { id: "1" } },
+    { params: { id: "2" } },
+    { params: { id: "3" } },
+    { params: { id: "4" } },
+    { params: { id: "5" } },
   ];
-  /*
-   * For now, we are specifying all paths manually, that might be fine for few paths but not for paths
-   * stored in database, we will discuss about tackling this issue later.
-   */
 
   /*
-   * getStaticPaths must return paths and fallback value. We will discuss fallback later.
+   * We discussed, how we can specify paths for getStaticProps. But, what if we have
+   * 1000s of posts and we don't want to specify all of them? We can specify paths for
+   * popular posts then allow Next.js to generate pages for other posts on demand.
+   *
+   * fallback value accepts two values, boolean or "blocking". Default behavior is false.
+   * By default or when fallback is false, any paths not returned by getStaticPaths will result
+   * in 404 error. This means, /tweets/6 will result in 404 error because it's not specified inside
+   * paths.
+   *
+   * When fallback is set to true, Next.js will serve a "fallback" version fo the page on first request.
+   * This fallback version is just a blank page with loading indicator. Then, Next.js will generate
+   * the full version of the page in the background and serve it to the user. This means, /tweets/6
+   * will result in a blank page with loading indicator, and then it will show the page.
+   * Next.js will just run getStaticProps in background to get data for the specified id in background.
+   * This data will be cached for future use, which means if you visit /tweets/6 again, you won't see
+   * loading indicator. Build the project to see this in action.
+   *
+   * When fallback is set to "blocking", Next.js will wait for getStaticProps to finish before
+   * serving the page.
    */
-  return { paths, fallback: false };
+  return { paths, fallback: "blocking" };
+
+  /*
+   * When path is set to empty [] with fallback: "blocking", this page will essentially behave similar to
+   * getServerSideProps which we will discuss later. The only difference is that, once it has generated page
+   * for a specific path, it will cache and reuse that later on which is not the case with getServerSideProps.
+   */
+  // return { paths: [], fallback: "blocking" };
 }
 
 export async function getStaticProps(context) {
-  /*
-   * If you visit /tweets/1 then you will see { id: '1' } as context.params.
-   * You will realize that, junk passed from getStaticPaths is ignored by Next.js because
-   * that's not really required.
-   */
   console.log(context.params);
   const res = await fetch(
     `https://jsonplaceholder.typicode.com/posts/${context.params.id}`
