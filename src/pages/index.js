@@ -3,49 +3,39 @@ import { getTweetsAPI } from "@/pages/api/tweets";
 import { useState } from "react";
 import Head from "next/head";
 import { useSession } from "next-auth/react";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import { TweetCard } from "@/components/TweetCard";
 
 export default function Home(props) {
   const [tweet, setTweet] = useState("");
-  const [author, setAuthor] = useState("");
   // useSession hook can be used to know if user is logged in or not
   const session = useSession();
 
-  console.log(session);
-
   const [tweets, setTweets] = useState(props.tweets);
+
+  async function fetchNewTweets() {
+    const res = await fetch("/api/tweets");
+    const data = await res.json();
+    setTweets(data);
+  }
 
   async function handleNewTweet(e) {
     e.preventDefault();
 
-    const res = await fetch("/api/tweets/new", {
+    await fetch("/api/tweets/new", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         tweet,
-        author,
       }),
+      credentials: "include",
     });
-
-    const newTweet = await res.json();
 
     setTweet("");
-    setAuthor("");
-
-    // Fix bug where it wasn't updating properly
-    setTweets((prev) => [newTweet, ...prev]);
-  }
-
-  async function handleDeleteTweet(id) {
-    const res = await fetch(`/api/tweets/${id}`, {
-      method: "DELETE",
-    });
-
-    const data = await res.json();
-    console.log(data);
-
-    setTweets((prev) => prev.filter((t) => t._id !== id));
+    fetchNewTweets();
   }
 
   return (
@@ -57,33 +47,22 @@ export default function Home(props) {
 
       <h1>Home Page</h1>
 
-      <form onSubmit={handleNewTweet}>
-        <input
-          type="text"
-          placeholder="Tweet"
-          value={tweet}
-          onChange={(e) => setTweet(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Author"
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-        />
-        <button type="submit">Submit</button>
-      </form>
+      {session.status === "authenticated" && (
+        <form onSubmit={handleNewTweet}>
+          <input
+            type="text"
+            placeholder="Tweet"
+            value={tweet}
+            onChange={(e) => setTweet(e.target.value)}
+          />
+          <button type="submit">Submit</button>
+        </form>
+      )}
 
       <ul>
         {tweets.map((t) => (
           <li key={t._id}>
-            <small>
-              {t.author} - {new Date(t.createdAt).toLocaleDateString()}
-            </small>
-            <h2>
-              <Link href={`/tweets/${t._id}`}>{t.tweet}</Link>
-            </h2>
-
-            <button onClick={() => handleDeleteTweet(t._id)}>Delete</button>
+            <TweetCard tweet={t} onTweetDeleted={fetchNewTweets} />
           </li>
         ))}
       </ul>
@@ -91,7 +70,7 @@ export default function Home(props) {
   );
 }
 
-export async function getServerSideProps() {
+export async function getServerSideProps(context) {
   /*
    * Here, I am accessing the API that I created and sending that back to the page.
    *
@@ -107,12 +86,18 @@ export async function getServerSideProps() {
   // const tweets = await res.json();
 
   // https://github.com/vercel/next.js/blob/canary/examples/with-mongodb-mongoose/pages/index.js#L56
-  const result = await getTweetsAPI();
+  const [result, session] = await Promise.all([
+    getTweetsAPI(),
+    getServerSession(context.req, context.res, authOptions),
+  ]);
+  if (session) session.user.image = null;
+
   const tweets = result.map((doc) => {
     const tweet = doc.toObject();
     tweet._id = tweet._id.toString();
     tweet.createdAt = tweet.createdAt.toString();
     tweet.updatedAt = tweet.updatedAt.toString();
+    tweet.author._id = tweet.author._id.toString();
 
     return tweet;
   });
@@ -120,6 +105,7 @@ export async function getServerSideProps() {
   return {
     props: {
       tweets,
+      session,
     },
   };
 }

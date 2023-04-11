@@ -1,5 +1,6 @@
-import { getTweetsFromIdAPI } from "@/pages/api/tweets/[id]";
+import { getTweetFromIdAPI } from "@/pages/api/tweets/[id]";
 import Head from "next/head";
+import Link from "next/link";
 
 export default function SingleTweetPage(props) {
   const title = `Thapa Technical Twitter - Tweet from ${props.tweet.author}`;
@@ -12,8 +13,10 @@ export default function SingleTweetPage(props) {
       </Head>
       <h1>{props.tweet.tweet}</h1>
       <p>
-        {props.tweet.author} -{" "}
-        {new Date(props.tweet.createdAt).toLocaleDateString()}
+        <Link href={`/profile/${props.tweet.author.username}`}>
+          {props.tweet.author.fullName}
+        </Link>{" "}
+        - {new Date(props.tweet.createdAt).toLocaleDateString()}
       </p>
     </div>
   );
@@ -30,10 +33,11 @@ export async function getServerSideProps(context) {
    * Which means context.params only contains dynamic route params and context.query contains
    * both dynamic route params and route queries.
    */
-  const tweet = (await getTweetsFromIdAPI(context.params.id)).toObject();
+  const tweet = (await getTweetFromIdAPI(context.params.id)).toObject();
   tweet._id = tweet._id.toString();
   tweet.createdAt = tweet.createdAt.toString();
   tweet.updatedAt = tweet.updatedAt.toString();
+  tweet.author._id = tweet.author._id.toString();
 
   return { props: { tweet } };
 }

@@ -13,8 +13,12 @@
  * to load pages without reloading.
  */
 import Link from "next/link";
+import { useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 export default function Navbar() {
+  const session = useSession();
+
   return (
     <div>
       <div>
@@ -32,6 +36,30 @@ export default function Navbar() {
           <li>
             <Link href="/contact">Contact</Link>
           </li>
+          {session.status === "authenticated" && (
+            <>
+              <li>
+                <Link href={`/profile/${session.data.user.username}`}>
+                  Profile
+                </Link>
+              </li>
+              <li>
+                <button onClick={() => signOut({ redirect: false })}>
+                  Signout
+                </button>
+              </li>
+            </>
+          )}
+          {session.status === "unauthenticated" && (
+            <>
+              <li>
+                <Link href="/login">Login</Link>
+              </li>
+              <li>
+                <Link href="/signup">Signup</Link>
+              </li>
+            </>
+          )}
         </ul>
       </div>
     </div>

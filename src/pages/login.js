@@ -21,7 +21,7 @@ export default function LoginPage() {
       email: user.username,
       password: user.password,
       username: user.username,
-      redirect: false,
+      callbackUrl: "/profile/binamralamsal",
     });
 
     if (status.ok) {

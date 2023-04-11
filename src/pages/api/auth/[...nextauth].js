@@ -4,7 +4,7 @@ import dbConnect from "@/lib/dbConnect";
 import User from "@/models/User";
 import { compare } from "bcryptjs";
 
-export default NextAuth({
+export const authOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -15,7 +15,6 @@ export default NextAuth({
           throw new Error("Internal server error");
         }
 
-        // check user existance
         const user = await User.findOne({
           $or: [
             { email: credentials.email },
@@ -35,12 +34,37 @@ export default NextAuth({
           throw new Error("Username or Password doesn't match");
         }
 
-        return user;
+        return {
+          id: user._id,
+          name: user.fullName,
+          email: user.email,
+          username: user.username,
+        };
       },
     }),
   ],
-  secret: process.env.JWT_SECRET,
   session: {
     strategy: "jwt",
   },
-});
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.username = user.username;
+        token.id = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id;
+        session.user.username = token.username;
+      }
+      return session;
+    },
+  },
+  pages: {
+    signIn: "/login",
+  },
+};
+
+export default NextAuth(authOptions);

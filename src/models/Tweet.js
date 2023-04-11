@@ -8,9 +8,9 @@ const TweetSchema = new mongoose.Schema(
       maxLength: [2000, "Tweet cannot be more than 2000 characters."],
     },
     author: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: [true, "Please provide an author for this tweet."],
-      maxLength: [50, "Author cannot be more than 50 characters."],
     },
   },
   {
